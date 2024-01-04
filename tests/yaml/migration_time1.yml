@@ -3,7 +3,7 @@ input:
   grid: $eclroot.EGRID
   properties:
     - source: $eclroot.UNRST
-      name: "AMFG"
+      name: ["SGAS","SWAT"]
       lower_threshold: 0.5
 
 output:
