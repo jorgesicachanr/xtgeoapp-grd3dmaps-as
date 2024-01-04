@@ -4,7 +4,7 @@ input:
   properties:
     - source: $eclroot.UNRST
       name: "SGAS"
-      #lower_threshold: 0.00005
+      lower_threshold: -1.00005
 
 output:
   mapfolder: tmp
