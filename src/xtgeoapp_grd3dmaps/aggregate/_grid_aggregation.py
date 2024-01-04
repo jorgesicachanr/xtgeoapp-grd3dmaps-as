@@ -296,7 +296,8 @@ def _property_to_map(
     assert weights is None or weights.shape == prop.shape
     if weights is not None:
         assert method in [AggregationMethod.MEAN, AggregationMethod.SUM]
-    if True:
+    
+    if method in [AggregationMethod.MEAN, AggregationMethod.SUM]:
         data = prop[0][cols] # Necessary change for the code to work
     else:
         data = prop[cols]
