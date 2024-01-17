@@ -1,0 +1,116 @@
+[build-system]
+requires = [
+    "setuptools>=45.0",
+    "setuptools_scm[toml]>=6.2",
+    "wheel>=0.38.1",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/ccs_scripts/version.py"
+
+[project]
+name = "ccs-scripts"
+description = "Equinor's collection of scripts related to CCS"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Equinor", email = "fmmo@equinor.com" },
+]
+keywords = ["ccs", "subsurface", "reservoir", "scientific", "engineering"]
+classifiers = [
+    # "Development Status :: 5 - Production/Stable",
+    # "Intended Audience :: Science/Research",
+    # "Topic :: Scientific/Engineering",
+    # "Topic :: Scientific/Engineering :: Physics",
+    # "Topic :: Software Development :: Libraries",
+    # "Topic :: Utilities",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Natural Language :: English",
+    # "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+dynamic = ["version"]
+dependencies = [
+    "resdata",
+    "numpy<2",
+    "pandas",
+    "scipy",
+    "shapely",
+    "xtgeo",
+]
+
+[project.optional-dependencies]
+tests = [
+    "black",
+    "flake8",
+    "isort",
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-xdist",
+    "rstcheck",
+    "rstcheck-core",
+    "types-Jinja2",
+    "types-PyYAML",
+    "types-pkg_resources",
+    "types-python-dateutil",
+]
+docs = [
+    "autoapi",
+    "sphinx",
+    "sphinx-argparse",
+    "sphinx-autodoc-typehints",
+    "sphinx-copybutton",
+    "sphinx_rtd_theme",
+]
+
+[project.urls]
+Homepage = "https://github.com/equinor/ccs_scripts"
+Repository = "https://github.com/equinor/ccs_scripts"
+# Documentation = "https://equinor.github.io/ccs_scripts"
+
+[project.scripts]
+co2_containment = "ccs_scripts.co2_containment.co2_containment:main"
+co2_plume_area = "ccs_scripts.co2_plume_area.co2_plume_area:main"
+co2_plume_extent = "ccs_scripts.co2_plume_extent.co2_plume_extent:main"
+
+[project.entry-points.ert]
+ccs_scripts_jobs = "ccs_scripts.hook_implementations.jobs"
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+ignore_missing_imports = true
+
+[tool.pylint]
+# Module docstrings are not required, there are other means of documenting at
+# that level ... ?
+disable = "missing-module-docstring"
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".git",
+    ".tox",
+    ".env",
+    "dist",
+    "build",
+    # "opm-common",
+]
+# addopts = "-ra --strict-markers --ignore=docs/conf.py --ignore=setup.py --ignore=.eggs"
+# markers = [
+#     "integration: Marks a test as an integration test",
+#     "plot: Marks a test as interactive, plots will flash to the screen",
+#     "ri_dev: A test using a dev version of ResInsight, skipped by default"
+# ]
+
+[tool.rstcheck]
+ignore_directives = ["argparse", "automodule"]
