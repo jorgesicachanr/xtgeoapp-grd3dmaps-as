@@ -6,13 +6,14 @@ explicitly provided.
 """
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, List, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
 
 class AggregationMethod(Enum):
     """
     Enum representing the available aggregation methods for `grid3d_aggregate_map`
     """
+
     MAX = "max"
     MIN = "min"
     MEAN = "mean"
@@ -123,7 +124,7 @@ class Output:
 class RootConfig:
     input: Input
     output: Output
-    zonation: Zonation = Zonation()
-    computesettings: ComputeSettings = ComputeSettings()
-    mapsettings: MapSettings = MapSettings()
+    zonation: Zonation = field(default_factory=Zonation)
+    computesettings: ComputeSettings = field(default_factory=ComputeSettings)
+    mapsettings: MapSettings = field(default_factory=MapSettings)
     co2_mass_settings: Optional[CO2MassSettings] = None
