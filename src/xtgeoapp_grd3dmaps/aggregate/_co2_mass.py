@@ -1,12 +1,14 @@
 import os
-from dataclasses import dataclass, fields
 from typing import Dict, List, Literal, Optional, Tuple
 
 import numpy as np
 import xtgeo
-from ecl.eclfile import EclFile
-from ecl.grid import EclGrid
-from ccs_scripts.co2_containment.co2_calculation import (_fetch_properties, _identify_gas_less_cells, _is_subset, Co2Data, Co2DataAtTimeStep)
+from resdata.resfile import ResdataFile
+from ccs_scripts.co2_containment.co2_calculation import (_fetch_properties,
+                                                         _identify_gas_less_cells,
+                                                         _is_subset,
+                                                         Co2Data,
+                                                         Co2DataAtTimeStep)
 from xtgeoapp_grd3dmaps.aggregate._config import CO2MassSettings
 
 CO2_MASS_PNAME = "CO2Mass"
@@ -15,6 +17,17 @@ CO2_MASS_PNAME = "CO2Mass"
 # pylint: disable=invalid-name,too-many-instance-attributes
 
 def _get_gasless(properties: Dict[str, Dict[str, List[np.ndarray]]]) -> np.ndarray:
+
+    """
+    Identifies global index for grid cells without CO2 based on Gas Saturation (SGAS)
+    and Mole Fraction of Gas in aqueous phase (AMFG/XMF2)
+
+    Args:
+        properties (Dict) : Properties that will be used to compute CO2 mass
+
+    Returns:
+        np.ndarray
+    """
     if _is_subset(["SGAS", "AMFG"], list(properties.keys())):
         gasless = _identify_gas_less_cells(properties["SGAS"], properties["AMFG"])
     elif _is_subset(["SGAS", "XMF2"], list(properties.keys())):
@@ -35,13 +48,25 @@ def translate_co2data_to_property(
     grid_out_dir: str,
 ) -> List[List[xtgeo.GridProperty]]:
     """
-    Convert CO2 mass arrays and save calculated CO2 mass as grid files
+    Convert CO2 data into 3D GridProperty
+
+    Args:
+        co2_data (Co2Data): Information of the amount of CO2 at each cell in
+                            each time step
+        grid_file (str): Path to EGRID-file
+        co2_mass_settings (CO2MassSettings): Settings from config file for calculation
+                                             of CO2 mass maps.
+        properties_to_extract (List): Names of the properties to be extracted
+        grid_out_dir (str): Path to store the produced 3D GridProperties.
+
+    Returns:
+        List[List[xtgeo.GridProperty]]
+
     """
     dimensions, triplets = _get_dimensions_and_triplets(
         grid_file, co2_mass_settings.unrst_source, properties_to_extract
     )
 
-    # Setting up the grid folder to store the gridproperties
     if not os.path.exists(grid_out_dir):
         os.makedirs(grid_out_dir)
 
@@ -90,6 +115,18 @@ def _get_dimensions_and_triplets(
     unrst_file: str,
     properties_to_extract: List[str],
 ) -> Tuple[Tuple[int, int, int], List[Tuple[int, int, int]]]:
+    """
+    Gets the size of the 3D grid and (X,Y,Z) position of cells with CO2
+
+    Args:
+        grid_file (str): Path to EGRID-file
+        unrst_file (str): Path to UNRST-file
+        properties_to_extract (List): Names of the properties to be extracted
+
+    Returns:
+        Tuple[Tuple[int, int, int], List[Tuple[int, int, int]]]:
+
+    """
     grid_pf = xtgeo.grid_from_file(grid_file)
     dimensions = (grid_pf.ncol, grid_pf.nrow, grid_pf.nlay)
     unrst = EclFile(unrst_file)
@@ -112,7 +149,15 @@ def _convert_to_grid(
     triplets: List[Tuple[int, int, int]],
 ) -> Dict[str, xtgeo.GridProperty]:
     """
-    Store the CO2 mass arrays in grid objects
+    Store the CO2 mass arrays in 3D GridProperties
+
+    Args:
+        co2_at_date (Co2DataAtTimeStep): Amount of CO2 per phase at each cell at each time step
+        dimensions (Tuple[int,int,int]): Size of the 3D grid
+        triplets (List[Tuple[int, int, int]]): List of triplets with the (X,Y,Z) position of cells with CO2
+
+    Returns:
+        Dict[str, xtgeo.GridProperty]
     """
     grids = {}
     date = str(co2_at_date.date)
