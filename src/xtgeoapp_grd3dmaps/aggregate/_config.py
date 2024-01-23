@@ -6,13 +6,14 @@ explicitly provided.
 """
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Optional, List, Tuple, Dict
+from typing import Dict, List, Optional, Tuple
 
 
 class AggregationMethod(Enum):
     """
     Enum representing the available aggregation methods for `grid3d_aggregate_map`
     """
+
     MAX = "max"
     MIN = "min"
     MEAN = "mean"
@@ -33,13 +34,14 @@ class Property:
 @dataclass
 class Input:
     grid: str
-    properties: List[Property]
+    properties: Optional[List[Property]] = None
     dates: List[str] = field(default_factory=list)
 
     def __post_init__(self):
         self.dates = [str(d).replace("-", "") for d in self.dates]
         if (
-            len(self.properties) > 0
+            self.properties is not None
+            and len(self.properties) > 0
             and isinstance(self.properties[0], dict)
         ):
             self.properties = [Property(**p) for p in self.properties]
@@ -81,6 +83,16 @@ class ComputeSettings:
 
 
 @dataclass
+class CO2MassSettings:
+    unrst_source: str
+    init_source: str
+    maps: Optional[List[str]] = None
+
+    def __post_init__(self):
+        pass
+
+
+@dataclass
 class MapSettings:
     # pylint: disable=too-many-instance-attributes
     xori: Optional[float] = None
@@ -112,6 +124,7 @@ class Output:
 class RootConfig:
     input: Input
     output: Output
-    zonation: Zonation = Zonation()
-    computesettings: ComputeSettings = ComputeSettings()
-    mapsettings: MapSettings = MapSettings()
+    zonation: Zonation = field(default_factory=Zonation)
+    computesettings: ComputeSettings = field(default_factory=ComputeSettings)
+    mapsettings: MapSettings = field(default_factory=MapSettings)
+    co2_mass_settings: Optional[CO2MassSettings] = None

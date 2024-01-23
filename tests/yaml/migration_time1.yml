@@ -3,8 +3,8 @@ input:
   grid: $eclroot.EGRID
   properties:
     - source: $eclroot.UNRST
-      name: "SWAT"
-      lower_threshold: 0.5
+      name: "SGAS"
+      lower_threshold: -1.00005
 
 output:
   mapfolder: tmp
