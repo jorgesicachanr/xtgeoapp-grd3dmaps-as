@@ -4,7 +4,6 @@ import sys
 import tempfile
 
 import xtgeo
-from _co2_mass import extract_source_data
 
 from xtgeoapp_grd3dmaps.aggregate import (
     _co2_mass,
@@ -14,6 +13,7 @@ from xtgeoapp_grd3dmaps.aggregate import (
 )
 from xtgeoapp_grd3dmaps.aggregate._config import CO2MassSettings
 
+from ccs_scripts.co2_containment.co2_calculation import calculate_co2
 PROPERTIES_TO_EXTRACT = [
     "RPORV",
     "PORV",
@@ -47,19 +47,10 @@ def calculate_mass_property(
     co2_mass_settings: CO2MassSettings,
     out_folder: _config.Output,
 ):
-    """
-    Calculates a 3D CO2 mass property from the provided grid and grid property
-    files
-    """
-    source_data = extract_source_data(
-        grid_file,
-        co2_mass_settings.unrst_source,
-        PROPERTIES_TO_EXTRACT,
-        co2_mass_settings.init_source,
-        None,
-    )
 
-    co2_data = _co2_mass.generate_co2_mass_data(source_data)
+#Calculates a 3D CO2 mass property from the provided grid and grid property files
+
+    co2_data = calculate_co2(grid_file,co2_mass_settings.unrst_source,"mass",co2_mass_settings.init_source,None)
 
     out_property_list = _co2_mass.translate_co2data_to_property(
         co2_data,
